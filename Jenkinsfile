@@ -3,7 +3,7 @@ pipeline {
     agent any
     // global env variables
     environment {
-        EMAIL_RECIPIENTS = 'mahmoud.romeh@test.com'
+        EMAIL_RECIPIENTS = 'srinivas.bsg@gmail.com'
     }
     tools { 
         maven 'Maven 3.5.4' 
