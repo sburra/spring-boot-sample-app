@@ -2,8 +2,8 @@ pipeline {
     // run on jenkins nodes tha has java 8 label
     agent any
     tools { 
-        maven 'Maven 3.3.9' 
-        jdk 'jdk8' 
+        maven 'Maven 3.5.4' 
+        jdk 'java8' 
     }
 
     // global env variables
