@@ -7,10 +7,7 @@ pipeline {
     environment {
         EMAIL_RECIPIENTS = 'srinivas.bsg@gmail.com'
     }
-    tools { 
-        maven 'Maven 3.5.4' 
-        jdk 'java8' 
-    }
+   
     stages {
 
         stage('Build with unit testing') {
