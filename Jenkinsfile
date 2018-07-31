@@ -1,8 +1,10 @@
 pipeline {
     // run on jenkins nodes tha has java 8 label
-    agent {
-        label "java8"
-            }
+    agent any
+    tools { 
+        maven 'Maven 3.3.9' 
+        jdk 'jdk8' 
+    }
 
     // global env variables
     environment {
@@ -35,6 +37,7 @@ pipeline {
                     } else {
                         bat(/"${mvnHome}\bin\mvn" -Dintegration-tests.skip=true clean package/)
                         def pom = readMavenPom file: 'pom.xml'
+                        print 'target build version in else block...'
                         print pom.version
                         junit '**//*target/surefire-reports/TEST-*.xml'
                         archive 'target*//*.jar'
