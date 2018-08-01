@@ -37,9 +37,9 @@ pipeline {
                         archive 'target*//*.jar'
                     } else {
                         bat(/"${mvnHome}\bin\mvn" -Dintegration-tests.skip=true clean package/)
-                        print 'target build version in else block...'
+                        print 'target build version in else block bfore readmavenpom...'
                         def pom = readMavenPom file: 'pom.xml'
-                        print 'target build version in else block...'
+                         print 'target build version in else block after readmavenpom...'
                         print pom.version
                         junit '**//*target/surefire-reports/TEST-*.xml'
                         archive 'target*//*.jar'
