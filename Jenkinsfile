@@ -41,7 +41,7 @@ pipeline {
                         def pom = readMavenPom file: 'pom.xml'
                          print 'target build version in else block after readmavenpom...'
                         print pom.version
-                        junit '**//*target/surefire-reports/TEST-*.xml'
+                       // junit '**//*target/surefire-reports/TEST-*.xml'
                         archive 'target*//*.jar'
                     }
                 }
