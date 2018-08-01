@@ -21,6 +21,7 @@ pipeline {
                     // ** NOTE: This 'M3' Maven tool must be configured
                     // **       in the global configuration.
                     echo 'Pulling...' + env.BRANCH_NAME
+                     print 'before if isUnix...'
                     def mvnHome = tool 'Maven 3.5.4'
                     if (isUnix()) {
                         def targetVersion = getDevVersion()
@@ -36,6 +37,7 @@ pipeline {
                         archive 'target*//*.jar'
                     } else {
                         bat(/"${mvnHome}\bin\mvn" -Dintegration-tests.skip=true clean package/)
+                        print 'target build version in else block...'
                         def pom = readMavenPom file: 'pom.xml'
                         print 'target build version in else block...'
                         print pom.version
