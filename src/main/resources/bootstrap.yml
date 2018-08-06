@@ -1,7 +1,7 @@
 spring:
 # change the application name for your project name , this name is reserved for the maven archetype code generation
   application:
-    name: Application
+    name: SampleApplicationConfig
 
 ---
 # DO NOT FORGET TO ADD YOUR YAML CONFIG FILE IN config server as shown below
@@ -12,4 +12,4 @@ spring:
       server:
         bootstrap: true
         git:
-          uri: https://github.com/Romeh/config.git
+          uri: https://github.com/sburra/config.git
