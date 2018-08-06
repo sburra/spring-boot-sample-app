@@ -65,7 +65,7 @@ pipeline {
                 cucumber buildStatus: null, fileIncludePattern: '**/cucumber.json', jsonReportDirectory: 'target', sortingMethod: 'ALPHABETICAL'
             }
         }
-        stage('Sonar scan execution') {
+        /*stage('Sonar scan execution') {
             // Run the sonar scan
             steps {
                 script {
@@ -91,7 +91,7 @@ pipeline {
                     }
                 }
             }
-        }
+        }*/
         stage('Development deploy approval and deployment') {
             steps {
                 script {
