@@ -9,11 +9,11 @@ import org.springframework.scheduling.annotation.EnableScheduling;
 @SpringBootApplication
 @EnableScheduling
 @EnableRetry
-public class Application1 {
+public class Application {
 
     public static void main(String[] args) {
         final SpringApplication springApplication =
-            new SpringApplication(Application1.class);
+            new SpringApplication(Application.class);
         springApplication.addListeners(new ApplicationPidFileWriter());
         springApplication.run(args);
     }
