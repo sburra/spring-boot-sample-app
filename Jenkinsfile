@@ -40,6 +40,7 @@ pipeline {
                         print 'target build version in else block bfore readmavenpom...'
                         def pom = readMavenPom file: 'pom.xml'
                          print 'target build version in else block after readmavenpom...'
+                        print 'calling getDevVersion()...'
                          def targetVersion = getDevVersion()
                         developmentArtifactVersion = "${pom.version}-${targetVersion}"
                         print pom.version
@@ -285,6 +286,7 @@ def sendEmail(status) {
 }
 
 def getDevVersion() {
+     print 'in  getDevVersion()...'
     def gitCommit = sh(returnStdout: true, script: 'git rev-parse HEAD').trim()
     def versionNumber;
     if (gitCommit == null) {
