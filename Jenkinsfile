@@ -42,6 +42,7 @@ pipeline {
                          print 'target build version in else block after readmavenpom...'
                         print 'calling getDevVersion()...'
                          def targetVersion = getDevVersion()
+                        print 'after getDevVersion()...'
                         developmentArtifactVersion = "${pom.version}-${targetVersion}"
                         print pom.version
                        // junit '**//*target/surefire-reports/TEST-*.xml'
