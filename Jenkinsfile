@@ -289,6 +289,7 @@ def sendEmail(status) {
 def getDevVersion() {
      print 'in  getDevVersion()...'
     def gitCommit = sh(returnStdout: true, script: 'git rev-parse HEAD').trim()
+     print 'after sh in  getDevVersion()...'
     def versionNumber;
     if (gitCommit == null) {
         versionNumber = env.BUILD_NUMBER;
