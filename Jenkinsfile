@@ -109,7 +109,8 @@ pipeline {
                             //
                             if (developmentArtifactVersion != null && !developmentArtifactVersion.isEmpty()) {
                                 // replace it with your application name or make it easily loaded from pom.xml
-                                def jarName = "application-${developmentArtifactVersion}.jar"
+                                def pom = readMavenPom file: 'pom.xml'
+                                def jarName = "${pom.artifactId}-${developmentArtifactVersion}.jar"
                                 echo "the application is deploying ${jarName}"
                                 // NOTE : CREATE your deployemnt JOB, where it can take parameters whoch is the jar name to fetch from jenkins workspace
                                 build job: 'ApplicationToDev', parameters: [[$class: 'StringParameterValue', name: 'jarName', value: jarName]]
