@@ -46,7 +46,7 @@ pipeline {
                         developmentArtifactVersion = "${pom.version}-${targetVersion}"
                         print pom.version
                        // junit '**//*target/surefire-reports/TEST-*.xml'
-                        archiveArtifacts '/**/*.jar'
+                        archiveArtifacts '**/*.jar'
                     }
                 }
 
