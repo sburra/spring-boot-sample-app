@@ -41,7 +41,7 @@ pipeline {
                         def pom = readMavenPom file: 'pom.xml'
                          print 'target build version in else block after readmavenpom...'
                         print 'calling getDevVersion()...'
-                         def targetVersion ='001'
+                         def targetVersion =getDevVersion()
                         print 'after getDevVersion()...'
                         developmentArtifactVersion = "${pom.version}-${targetVersion}"
                         echo "development version.........      ${developmentArtifactVersion}"
