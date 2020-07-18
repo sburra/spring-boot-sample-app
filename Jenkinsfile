@@ -2,7 +2,7 @@ pipeline {
     // run on jenkins nodes tha has java 8 label
     agent any
     tools { 
-        maven 'Maven 3.5.4' 
+        maven 'Maven3.5.3' 
         jdk 'java8' 
     }
 
