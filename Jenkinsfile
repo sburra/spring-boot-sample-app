@@ -44,7 +44,7 @@ pipeline {
                          def targetVersion ='001'
                         print 'after getDevVersion()...'
                         developmentArtifactVersion = "${pom.version}-${targetVersion}"
-                        echo '${developmentArtifactVersion}'
+                        echo "development version.........      ${developmentArtifactVersion}"
                         print pom.version
                        // junit '**//*target/surefire-reports/TEST-*.xml'
                         archiveArtifacts '**/*.jar'
