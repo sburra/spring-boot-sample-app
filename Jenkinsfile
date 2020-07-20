@@ -2,7 +2,7 @@ pipeline {
     // run on jenkins nodes tha has java 8 label
     agent any
     tools { 
-        maven 'Maven3.5.3' 
+        maven 'Maven3.5.3'
         jdk 'java8' 
     }
 
@@ -21,7 +21,8 @@ pipeline {
                     // ** NOTE: This 'M3' Maven tool must be configured
                     // **       in the global configuration.
                     echo 'Pulling...' + env.BRANCH_NAME
-                     print 'before if isUnix...'
+                    echo 'brancg name '+ env.JOB_NAME
+                    print 'before if isUnix...'
                     def mvnHome = tool 'Maven3.5.3'
                     if (isUnix()) {
                         def targetVersion = getDevVersion()
@@ -30,7 +31,7 @@ pipeline {
                         sh "'${mvnHome}/bin/mvn' -Dintegration-tests.skip=true -Dbuild.number=${targetVersion} clean package"
                         def pom = readMavenPom file: 'pom.xml'
                         // get the current development version
-                        developmentArtifactVersion = c
+                        developmentArtifactVersion = "${pom.version}-${targetVersion}"
                         print pom.version
                         // execute the unit testing and collect the reports
                         //junit '**//*target/surefire-reports/TEST-*.xml'
@@ -40,18 +41,44 @@ pipeline {
                         print 'target build version in else block bfore readmavenpom...'
                         def pom = readMavenPom file: 'pom.xml'
                          print 'target build version in else block after readmavenpom...'
-                        print 'calling getDevVersion()...'
-                         def targetVersion =getDevVersion()
-                        print 'after getDevVersion()...'
+                         //def targetVersion = getDevVersion()
+                        def targetVersion ='001'
+                         print 'after getdevVesion...'
                         developmentArtifactVersion = "${pom.version}-${targetVersion}"
-                        echo "development version.........      ${developmentArtifactVersion}"
+                        print 'pom version ' 
                         print pom.version
+                         print 'targetVersion ' 
+                        print targetVersion
+                         print 'developmentArtifactVersion '
+                        print developmentArtifactVersion
                        // junit '**//*target/surefire-reports/TEST-*.xml'
-                        archiveArtifacts '**/*.jar'
+                        archiveArtifacts 'target*//*.jar'
+                        def dir = pwd() 
+                        echo 'archiveArtifacts      dir name ......' + dir
                     }
                 }
 
             }
+        }
+        stage('Copy Archive') {
+         steps {
+             script {
+                 def dir = pwd() 
+                 echo 'dir name ......' + dir
+                 echo 'job name ......' +'${JOB_NAME}'
+                /* step ([$class: 'CopyArtifact',
+                 projectName: 'pcfexample',
+                 filter:'C:/Program Files (x86)/Jenkins/workspace/pcfexample/target/SpringBootHelloWorldPcf-0.0.1-SNAPSHOT.jar',
+                 target: 'Infra']);*/
+                 step([  $class: 'CopyArtifact',
+                        filter: 'target/*.jar',
+                        fingerprintArtifacts: true,
+                        projectName: '${JOB_NAME}',
+                       target: './DeployableJars',
+                        selector: [$class: 'SpecificBuildSelector', buildNumber: '${BUILD_NUMBER}']
+                ])
+             }
+         }
         }
         stage('Integration tests') {
             // Run integration test
@@ -67,7 +94,9 @@ pipeline {
 
                 }
                 // cucumber reports collection
+                 echo 'cucumber buildStatus:........started'
                 cucumber buildStatus: null, fileIncludePattern: '**/cucumber.json', jsonReportDirectory: 'target', sortingMethod: 'ALPHABETICAL'
+                echo 'cucumber buildStatus:........ended'
             }
         }
         /*stage('Sonar scan execution') {
@@ -100,21 +129,31 @@ pipeline {
         stage('Development deploy approval and deployment') {
             steps {
                 script {
+                    echo 'Development deploy approval and deployment........started'
                     if (currentBuild.result == null || currentBuild.result == 'SUCCESS') {
-                        timeout(time: 3, unit: 'MINUTES') {
+                        timeout(time: 5, unit: 'MINUTES') {
                             // you can use the commented line if u have specific user group who CAN ONLY approve
                             //input message:'Approve deployment?', submitter: 'it-ops'
                             input message: 'Approve deployment?'
                         }
-                        timeout(time: 2, unit: 'MINUTES') {
+                        timeout(time: 5, unit: 'MINUTES') {
                             //
                             if (developmentArtifactVersion != null && !developmentArtifactVersion.isEmpty()) {
                                 // replace it with your application name or make it easily loaded from pom.xml
                                 def pom = readMavenPom file: 'pom.xml'
+                        // get the current development version
+                                //developmentArtifactVersion = "${pom.version}-${targetVersion}"
                                 def jarName = "${pom.artifactId}-${developmentArtifactVersion}.jar"
                                 echo "the application is deploying ${jarName}"
                                 // NOTE : CREATE your deployemnt JOB, where it can take parameters whoch is the jar name to fetch from jenkins workspace
-                                build job: 'ApplicationToDev', parameters: [[$class: 'StringParameterValue', name: 'jarName', value: jarName]]
+                               // build job: 'ApplicationToDev', parameters: [[$class: 'StringParameterValue', name: 'jarName', value: jarName]]
+                                echo "CF Login..."
+                                def dir = pwd() 
+                                echo 'dir name ......' + dir
+                               sh '''
+                                cf login -a 'api.run.pivotal.io' -u 'sandeep.amarnath.jan5@gmail.com' -p 'Welcome12#' -o 'SandeepPCF' -s 'development' 
+                                cf push -d 'pcf.domain' 
+                                 '''
                                 echo 'the application is deployed !'
                             } else {
                                 error 'the application is not  deployed as development version is null!'
@@ -125,7 +164,7 @@ pipeline {
                 }
             }
         }
-        stage('DEV sanity check') {
+       /* stage('DEV sanity check') {
             steps {
                 // give some time till the deployment is done, so we wait 45 seconds
                 sleep(45)
@@ -133,7 +172,7 @@ pipeline {
                     if (currentBuild.result == null || currentBuild.result == 'SUCCESS') {
                         timeout(time: 1, unit: 'MINUTES') {
                             script {
-                                def mvnHome = tool 'Maven3.5.3'
+                                def mvnHome = tool 'Maven 3.5.4'
                                 //NOTE : if u change the sanity test class name , change it here as well
                                 sh "'${mvnHome}/bin/mvn' -Dtest=ApplicationSanityCheck_ITT surefire:test"
                             }
@@ -142,7 +181,7 @@ pipeline {
                     }
                 }
             }
-        }
+        }*/
         stage('Release and publish artifact') {
             when {
                 // check if branch is master
@@ -151,7 +190,7 @@ pipeline {
             steps {
                 // create the release version then create a tage with it , then push to nexus releases the released jar
                 script {
-                    def mvnHome = tool 'Maven3.5.3' //
+                    def mvnHome = tool 'Maven 3.5.4' //
                     if (currentBuild.result == null || currentBuild.result == 'SUCCESS') {
                         def v = getReleaseVersion()
                         releasedVersion = v;
@@ -216,7 +255,7 @@ pipeline {
                         timeout(time: 1, unit: 'MINUTES') {
 
                             script {
-                                def mvnHome = tool 'Maven3.5.3'
+                                def mvnHome = tool 'Maven 3.5.4'
                                 // NOTE : if you change the test class name change it here as well
                                 sh "'${mvnHome}/bin/mvn' -Dtest=ApplicationE2E surefire:test"
                             }
@@ -232,6 +271,7 @@ pipeline {
         always {
             // Let's wipe out the workspace before we finish!
             deleteDir()
+            sendEmail("Deleted");
         }
         success {
             sendEmail("Successful");
@@ -289,9 +329,9 @@ def sendEmail(status) {
 }
 
 def getDevVersion() {
-     print 'in  getDevVersion()...'
+    print 'in getdevVesion...'
     def gitCommit = sh(returnStdout: true, script: 'git rev-parse HEAD').trim()
-     print 'after sh in  getDevVersion()...'
+    print 'after script...'
     def versionNumber;
     if (gitCommit == null) {
         versionNumber = env.BUILD_NUMBER;
